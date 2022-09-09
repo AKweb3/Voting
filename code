@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.14;
+contract Voting {
+    address owner;
+    constructor () {
+    owner=msg.sender;}   
+
+modifier onlyOwner {
+require(msg.sender == owner); 
+_;}
+
+struct Voter {
+uint candidateIDVote; 
+bool hasVoted;
+}
+struct Candidate {
+string name; 
+string party; 
+uint noOFVotes; 
+bool doesExist;
+}
+uint numCandidates;
+uint numVoters;
+uint numOfVotes ;
+mapping (uint => Candidate) candidates;
+mapping (address => Voter) voters;
+function addCandidate(string memory name, string memory party) onlyOwner public
+{
+    uint candidateID = numCandidates++;
+    candidates[candidateID] = Candidate(name,party,0,true);
+}
+function vote(uint candidateID) public {
+    require(!voters[msg.sender].hasVoted);
+    if (candidates[candidateID].doesExist == true) { 
+    voters[msg.sender] = Voter(candidateID, true); 
+    candidates[candidateID].noOFVotes++; 
+    numOfVotes++;
+    numVoters++;
+    }
+}
+function totalVotes(uint candidateID) view public returns (uint) {
+return candidates[candidateID].noOFVotes;
+}
+
+function getNumOfCandidates() public view returns(uint) { 
+return numCandidates;
+}
+function getNumOfVoters() public view returns(uint) { 
+return numVoters;
+}
+function getCandidate(uint candidateID) public view returns (uint,string
+memory,string memory ,uint) { return 
+(candidateID,candidates[candidateID].name,candidates[candidateID].party,
+candidates[candidateID].noOFVotes);
+}
+}
